@@ -15,40 +15,13 @@ defmodule PerSecondBilling do
   end
 
   defp parse_period(period) do
-    [
-      year_1,
-      month_1,
-      day_1,
-      hour_1,
-      minute_1,
-      second_1,
-      year_2,
-      month_2,
-      day_2,
-      hour_2,
-      minute_2,
-      second_2
-    ] =
+    [yr_1, mon_1, day_1, hr_1, min_1, sec_1, yr_2, mon_2, day_2, hr_2, min_2, sec_2] =
       ~r/^(\d{4})-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d) (\d{4})-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)/
       |> Regex.run(period, capture: :all_but_first)
       |> Enum.map(&String.to_integer/1)
 
-    {NaiveDateTime.new!(
-       year_1,
-       month_1,
-       day_1,
-       hour_1,
-       minute_1,
-       second_1
-     ),
-     NaiveDateTime.new!(
-       year_2,
-       month_2,
-       day_2,
-       hour_2,
-       minute_2,
-       second_2
-     )}
+    {NaiveDateTime.new!(yr_1, mon_1, day_1, hr_1, min_1, sec_1),
+     NaiveDateTime.new!(yr_2, mon_2, day_2, hr_2, min_2, sec_2)}
   end
 
   defp record_period({start_time, end_time}, report) do
