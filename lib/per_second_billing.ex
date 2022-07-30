@@ -1,17 +1,17 @@
 defmodule PerSecondBilling do
   def report(timestamp_pairs) do
-    case timestamp_pairs
-         |> Enum.map(&parse_period/1)
-         |> Enum.reduce(%{}, &record_period/2)
-         |> Enum.map(&to_csv_row/1)
-         |> Enum.join("\n") do
-      "" -> header()
-      rows -> header() <> rows <> "\n"
-    end
+    Enum.join([header() | rows(timestamp_pairs)], "\n") <> "\n"
   end
 
   defp header do
-    "DATE, #{Enum.map_join(0..23, ", ", &"HOUR_#{&1}")}\n"
+    "DATE, #{Enum.map_join(0..23, ", ", &"HOUR_#{&1}")}"
+  end
+
+  defp rows(timestamp_pairs) do
+    timestamp_pairs
+    |> Enum.map(&parse_period/1)
+    |> Enum.reduce(%{}, &record_period/2)
+    |> Enum.map(&to_csv_row/1)
   end
 
   defp parse_period(period) do
