@@ -52,10 +52,13 @@ defmodule PerSecondBilling do
   end
 
   defp record_period({start_time, end_time}, report) do
-    Map.put(
+    hour_values = hour_values(NaiveDateTime.to_time(start_time), NaiveDateTime.to_time(end_time))
+
+    Map.update(
       report,
       NaiveDateTime.to_date(start_time),
-      hour_values(NaiveDateTime.to_time(start_time), NaiveDateTime.to_time(end_time))
+      hour_values,
+      &add_hour_values(&1, hour_values)
     )
   end
 
@@ -70,6 +73,10 @@ defmodule PerSecondBilling do
     period_start_time = Enum.max([start_time, Time.new!(hour, 0, 0)], Time)
     period_end_time = Enum.min([end_time, Time.new!(hour + 1, 0, 0)], Time)
     Time.diff(period_end_time, period_start_time)
+  end
+
+  defp add_hour_values(existing_values, values) do
+    existing_values |> Enum.zip(values) |> Enum.map(fn {a, b} -> a + b end)
   end
 
   defp to_csv_row({date, hour_values}) do
